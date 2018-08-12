@@ -1,19 +1,21 @@
 <template>
   <div class="container">
-    <Header class="head"></Header>
-    <div id="body">
-      <div class="title">个人信息</div>
-      <el-row :gutter="20" v-for="(item, index) in userInfo" :key="index">
-        <el-col :span="6">{{ item.k }}</el-col>
-        <el-col :span="18">{{ item.v }}</el-col>
-      </el-row>
+    <div class="crumbs">
+      <div>当前位置</div>
+      <div>我的信息 > 个人信息</div>
     </div>
+    <el-row :gutter="20" v-for="(item, index) in userInfo" :key="index">
+      <el-col :span="6">{{ item.k }}</el-col>
+      <el-col :span="18" v-if="index !== 9">{{ item.v }}</el-col>
+      <el-col :span="18" v-else>
+        <img :src="item.v" alt="">
+      </el-col>
+    </el-row>
   </div>
 </template>
 
 <script>
 import service from '../../service/service.js'
-import Header from '../../components/part/Header.vue'
 
 export default {
   name: 'Admin',
@@ -28,6 +30,9 @@ export default {
         DIPLOMATIC: '外交人员身份证明'
       },
       userInfo: [{
+        k: '真实姓名',
+        v: ''
+      }, {
         k: '手机号码',
         v: ''
       }, {
@@ -48,34 +53,30 @@ export default {
       }, {
         k: '注册时间',
         v: ''
+      }, {
+        k: '审核时间',
+        v: ''
+      }, {
+        k: '个人头像',
+        v: ''
       }]
     }
-  },
-  components: {
-    Header
   },
   mounted () {
     service.requestUrl({
       url: '/user/info'
     }).then(res => {
-      const data = res.data
-      if (data.status !== '0x0000') {
-        this.$message({
-          showClose: true,
-          message: res.data.message,
-          type: 'warning'
-        })
-      }
-      if (data.status === '0x5002') {
-        this.$parent.logout()
-      }
-      this.userInfo[0].v = data.data.phone
-      this.userInfo[1].v = data.data.licenseType
-      this.userInfo[2].v = data.data.licenseNo
-      this.userInfo[3].v = `${this.time(data.data.licenseBeginDate)} 至 ${this.time(data.data.licenseEndDate)}`
-      this.userInfo[4].v = this.dataIdType[data.data.idType]
-      this.userInfo[5].v = data.data.idNo
-      this.userInfo[6].v = this.time(data.data.createTime)
+      console.log(res)
+      this.userInfo[0].v = res.realname
+      this.userInfo[1].v = res.phone
+      this.userInfo[2].v = res.licenseType
+      this.userInfo[3].v = res.licenseNo
+      this.userInfo[4].v = `${this.time(res.licenseBeginDate)} 至 ${this.time(res.licenseEndDate)}`
+      this.userInfo[5].v = this.dataIdType[res.idType]
+      this.userInfo[6].v = res.idNo
+      this.userInfo[7].v = this.time(res.createTime)
+      this.userInfo[8].v = res.auditTime ? this.time(res.auditTime) : '-'
+      this.userInfo[9].v = res.headUrl
     }).catch(err => {
       this.$message({
         showClose: true,
@@ -95,8 +96,26 @@ export default {
 </script>
 
 <style scoped>
+  .container .crumbs {
+    border-bottom: 0;
+    margin-bottom: 20px;
+  }
+
+  .crumbs div:first-child {
+    color: #11A0F8;
+    font-size: 18px;
+  }
+
+  .crumbs div:last-child {
+    color: #54667A;
+    font-size: 14px;
+  }
+
   .container {
     text-align: left;
+    background-color: #fff;
+    margin: 0!important;
+    padding: 20px;
   }
 
   .container .title {
@@ -104,8 +123,14 @@ export default {
     font-weight: bold;
   }
 
-  .container #body > div {
+  .container > div {
+    font-size: 18px;
     padding: 10px 0;
-    border-bottom: 1px #ddd solid;
+    border-bottom: 1px #E9F1F3 solid;
+  }
+
+  img {
+    width: 25mm;
+    height: 35mm;
   }
 </style>

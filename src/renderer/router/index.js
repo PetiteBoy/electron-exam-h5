@@ -5,6 +5,9 @@ import Login from '@/components/Login'
 import Home from '@/components/Home'
 
 import UserAdmin from '@/components/User/Admin'
+import UserEducationRecord from '@/components/User/EducationRecord'
+import UserExamRecord from '@/components/User/ExamRecord'
+import UserPrint from '@/components/User/Print'
 
 import ExamineIndex from '@/components/Examine/Index'
 import ExamineVideoNotice from '@/components/Examine/Video/Notice'
@@ -26,15 +29,24 @@ export default new Router({
     component: Login
   }, {
     path: '/Home',
-    component: Home
-  }, {
-    path: '/User/Admin',
-    component: UserAdmin
-  }, {
-    path: '/Examine/Index',
-    component: ExamineIndex,
+    component: Home,
     children: [{
       path: '/',
+      component: ExamineIndex
+    }, {
+      path: '/User/Admin',
+      component: UserAdmin
+    }, {
+      path: '/User/EducationRecord',
+      component: UserEducationRecord
+    }, {
+      path: '/User/ExamRecord',
+      component: UserExamRecord
+    }, {
+      path: '/User/Print',
+      component: UserPrint
+    }, {
+      path: '/Examine/Video/Notice',
       component: ExamineVideoNotice
     }, {
       path: '/Examine/Video/List',
@@ -45,12 +57,12 @@ export default new Router({
     }, {
       path: '/Examine/Examine/Notice',
       component: ExamineExamineNotice
-    }, {
-      path: '/Examine/Examine/Examine',
-      component: ExamineExamineExamine
-    }, {
-      path: '/Examine/Examine/Result',
-      component: ExamineExamineResult
     }]
+  }, {
+    path: '/Examine/Examine/Examine',
+    component: ExamineExamineExamine
+  }, {
+    path: '/Examine/Examine/Result',
+    component: ExamineExamineResult
   }]
 })

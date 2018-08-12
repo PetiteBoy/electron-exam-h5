@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <span class="l" @click="returnBack()">返回</span>
+    <span class="l">机动车驾驶人教育管理平台</span>
     <span>{{ userName }}</span>
     <span @click="logout()">注销</span>
   </div>
@@ -25,19 +25,7 @@ export default {
       service.requestUrl({
         url: '/user/info'
       }).then(res => {
-        const data = res.data
-        console.log(data)
-        if (data.status !== '0x0000') {
-          this.$message({
-            showClose: true,
-            message: res.data.message,
-            type: 'warning'
-          })
-        }
-        if (data.status === '0x5002') {
-          this.$parent.logout()
-        }
-        this.userName = data.data.phone
+        this.userName = res.phone
       }).catch(err => {
         this.$message({
           showClose: true,
@@ -49,9 +37,6 @@ export default {
     logout () {
       removeSessionStorage('authKey')
       this.$router.push('/login')
-    },
-    returnBack () {
-      this.$router.push('/Home')
     }
   }
 }
@@ -60,13 +45,24 @@ export default {
 <style scoped>
   .header {
     height: 60px;
-    background: #545c64;
     width: 100%;
     line-height: 60px;
-    color: #ffffff;
+    color: #54667a;
     text-align: right;
-    padding: 0 10px;
+    padding-right: 10px;
     box-sizing: border-box;
+    background-color: #fff;
+    border-bottom: solid 1px #e6e6e6;
+  }
+
+  .header span:first-child {
+    background-color: #f2f7f8;
+    display: inline-block;
+    width: 249px;
+    margin: 0;
+    border-right: solid 1px #e6e6e6;
+    text-align: center;
+    cursor: default;
   }
 
   .header span {
@@ -76,6 +72,6 @@ export default {
   }
 
   .header span:hover {
-    color: #dddddd;
+    color: #333;
   }
 </style>

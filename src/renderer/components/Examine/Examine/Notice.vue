@@ -1,48 +1,49 @@
 <template>
   <div class="container">
-    <Header class="head"></Header>
-
-    <div id="body">
-      <div class="notice">
-        <div>{{ notice.title ? notice.title : '公告' }}</div>
-        <textarea disabled style="resize: none; width: 100%; height: 400px" v-model="notice.content"></textarea>
-      </div>
-      <el-button type="primary" @click="navigation()">开始测试</el-button>
+    <div class="notice">
+      <div>{{ notice.title ? notice.title : '公告' }}</div>
+      <textarea disabled style="resize: none; width: 100%; height: calc(100% - 60px)" v-model="notice.content"></textarea>
     </div>
+    <div class="noticeTips" v-if="!status">提示：您还未完成视频学习要求，完成后才可参加考题测试</div>
+    <el-button :type="status ? 'primary' : 'info'" @click="navigation()">开始测试</el-button>
   </div>
 </template>
 
 <script>
 import service from '../../../service/service.js'
-import Header from '../../../components/part/Header.vue'
 
 export default {
   name: 'Notice',
   data () {
     return {
-      notice: ''
+      notice: '',
+      status: 1
     }
   },
-  components: {
-    Header
-  },
   mounted () {
+    service.requestUrl({
+      url: '/video/config/check/state',
+      method: 'get'
+    }).then(res => {
+      const that = this
+      res.map(function (v) {
+        if (v.learnNum > 0 && v.learnNum !== v.completeNum) {
+          that.status = 0
+        }
+      })
+    }).catch(err => {
+      this.$message({
+        showClose: true,
+        message: err,
+        type: 'warning'
+      })
+    })
+
     service.requestUrl({
       url: '/notice/find/checkquestion',
       method: 'get'
     }).then(res => {
-      const data = res.data
-      if (data.status !== '0x0000') {
-        this.$message({
-          showClose: true,
-          message: res.data.message,
-          type: 'warning'
-        })
-      }
-      if (data.status === '0x5002') {
-        this.$parent.logout()
-      }
-      this.notice = data.data
+      this.notice = res
     }).catch(err => {
       this.$message({
         showClose: true,
@@ -52,23 +53,16 @@ export default {
     })
   },
   methods: {
+    navBack () {
+      window.history.back()
+    },
     navigation () {
+      if (!this.status) return
       service.requestUrl({
         url: '/question/init',
         method: 'get'
       }).then(res => {
-        const data = res.data
-        if (data.status !== '0x0000') {
-          this.$message({
-            showClose: true,
-            message: res.data.message,
-            type: 'warning'
-          })
-        }
-        if (data.status === '0x5002') {
-          this.$parent.logout()
-        }
-        this.$router.push(`Examine?totalNum=${data.data.totalNum}&period=${data.data.period}`)
+        this.$router.push(`Examine?totalNum=${res.totalNum}&period=${res.period}`)
       }).catch(err => {
         this.$message({
           showClose: true,
@@ -83,20 +77,31 @@ export default {
 
 <style scoped>
   .notice {
-    padding: 40px;
-    border: 1px #ddd solid;
-    margin-bottom: 40px;
+    padding: 20px 40px;
+    background-color: #fff;
+    height: calc(100% - 160px);
   }
 
   .notice div {
-    font-size: 24px;
+    font-size: 28px;
     padding-bottom: 20px;
   }
 
   .notice textarea {
     text-align: left;
     border: 0;
-    font-size: 14px;
+    font-size: 18px;
     display: block;
+    line-height: 36px;
+    color: #54667A;
+  }
+
+  .noticeTips {
+    font-size: 18px;
+    padding-top: 20px;
+  }
+
+  .el-button {
+    margin-top: 20px;
   }
 </style>

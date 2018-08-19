@@ -5,7 +5,7 @@
       <div class="printBorder">
         <div id="print">
           <div class="printPadding">
-            <div class="title">机动车驾驶人审验教育记录单（正面）</div>
+            <div class="title">机动车驾驶人审验教育记录单</div>
             <div class="userInfo">
               <div>
                 <div>姓名：{{ data.realname }}</div>
@@ -23,6 +23,7 @@
               <div>该驾驶人于 {{ data.createTime }} 参加了道路交通安全法律法规、交通安全文明驾驶、应急处置等知识学习和交通事故案例警示教育。</div>
               <div class="r">
                 <div>市（县、区）公安机关</div>
+                <div>交通管理部门（印章）</div>
                 <div>年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;月&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;日</div>
               </div>
             </div>
@@ -50,6 +51,18 @@ export default {
     }
   },
   mounted () {
+    const printHeight = document.getElementsByClassName('print')[0].clientHeight
+    const printBorderScale = (printHeight / 1450).toFixed(2)
+    const printBorder = document.getElementsByClassName('printBorder')[0]
+    printBorder.style.transform = `scale(${printBorderScale})`
+
+    window.onresize = () => {
+      const printHeight = document.getElementsByClassName('print')[0].clientHeight
+      const printBorderScale = (printHeight / 1450).toFixed(2)
+      const printBorder = document.getElementsByClassName('printBorder')[0]
+      printBorder.style.transform = `scale(${printBorderScale})`
+    }
+
     this.id = this.$route.query.id
     service.requestUrl({
       url: `/user/edurecord/detail?id=${this.id}`,
@@ -108,6 +121,7 @@ export default {
 
   #print {
     padding: 100px;
+    font-size: 18px;
   }
 
   .printPadding {
@@ -119,7 +133,7 @@ export default {
   }
 
   .title {
-    font-size: 22px;
+    font-size: 26px;
     padding: 20px;
     text-align: center;
   }
@@ -151,6 +165,8 @@ export default {
   .info {
     margin-top: 100px;
     text-align: left;
+    line-height: 32px;
+    margin-bottom: 50px;
   }
 
   .info div {
@@ -158,9 +174,9 @@ export default {
   }
 
   .info .r {
-    padding-top: 150px;
+    padding-top: 60px;
     text-align: right;
-    line-height: 60px;
+    line-height: 40px;
   }
 
   .notice .title {
@@ -170,6 +186,7 @@ export default {
   .notice div {
     text-align: left;
     text-indent: 2em;
+    line-height: 32px;
   }
 
   .notice .r {

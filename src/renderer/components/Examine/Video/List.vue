@@ -55,7 +55,7 @@
         <div v-else></div>
       </div>
     </div>
-    <el-pagination background layout="prev, pager, next" :total="total" @current-change="handleCurrentChange"></el-pagination>
+    <el-pagination background :page-size="12" layout="prev, pager, next" :total="total" @current-change="handleCurrentChange"></el-pagination>
   </div>
 </template>
 
@@ -126,7 +126,7 @@ export default {
           return
         }
 
-        if (v.learnNum === v.completeNum) {
+        if (v.learnNum <= v.completeNum) {
           v.status = 1
         } else {
           v.status = 0
@@ -163,14 +163,17 @@ export default {
         data: {
           categoryId: this.categoryId,
           pageNum: 1,
-          pageSize: 3
+          pageSize: 12
         }
       }).then(res => {
         for (let item of res.list) {
           item.date = this.$parent.secondToDate(item.duration).date
-          item.endDate = (item.completedDuration / item.duration).toFixed(2) * 100
+          if (item.completedDuration < item.duration) {
+            item.endDate = (item.completedDuration / item.duration).toFixed(2) * 100
+          } else {
+            item.endDate = 100
+          }
         }
-
         this.list = res.list
         this.total = res.total
       }).catch(err => {
